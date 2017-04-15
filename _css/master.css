@@ -15,4 +15,12 @@ body {
 div#puzzleContainer {
   width: 400px;
   height: 400px;
+  position: relative;
+}
+
+div.puzzlePiece {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  background-image: url('../_img/puzzle.jpg');
 }
