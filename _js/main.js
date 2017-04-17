@@ -1,8 +1,8 @@
 var emptyCell = {'x': 3, 'y': 3};
-var tilePositions;
 var gridSize = 4;
 var animationDuration = 1000;
 var moveable = true;
+var possiblePositions = [];
 
 function createTile(x, y) {
   var tile = $('<div />', {'class':  'puzzlePiece'});
@@ -23,16 +23,37 @@ function initPuzzle() {
         createTile(j,i);
         tileCount++;
       }
+      possiblePositions.push({'x': j, 'y': i});
     }
+  }
+  console.log(possiblePositions);
+}
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
+
+function generateRandomArray() {
+  var randomArray = possiblePositions.slice(); // Duplicate array
+  do {
+    for (var i = 0; i < randomArray.length; i++) {
+      var randomInt = getRandomInt(0, randomArray.length);
+      var tempValue = randomArray[i];
+      randomArray[i] = randomArray[randomInt];
+      randomArray[randomInt] = tempValue;
+    }
+  } while (1 != 1);
+  return randomArray;
+}
+
+function randomize(randomArray) {
+  for (var i = 0; i < randomArray.length; i++) {
+    moveTile($('div.puzzlePiece:nth-child('+(i + 1)+')'), randomArray[i].x, randomArray[i].y);
   }
 }
 
-function randomize() {
-
-}
-
 function moveTile(tileNumber, x, y) {
-  tileNumber++; // CSS :nth-child starts with 1 instead of 0
+  tileNumber++; // CSS :nth-child selector starts with 1 instead of 0
   moveable = false;
   $('div.puzzlePiece:nth-child('+tileNumber+')').data('x', x);
   $('div.puzzlePiece:nth-child('+tileNumber+')').data('y', y);
@@ -119,5 +140,11 @@ $(document).ready(function() {
   initPuzzle();
   $('.puzzlePiece').click(function(evt) {
     move($(this).data());
+  });
+
+  $('#randomize').click(function() {
+    var randomArray = generateRandomArray();
+    console.log(randomArray);
+    randomize(randomArray);
   });
 });
