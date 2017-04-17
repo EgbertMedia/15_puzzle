@@ -33,12 +33,15 @@ function randomize() {
 
 function moveTile(tileNumber, x, y) {
   tileNumber++; // CSS :nth-child starts with 1 instead of 0
+  moveable = false;
+  $('div.puzzlePiece:nth-child('+tileNumber+')').data('x', x);
+  $('div.puzzlePiece:nth-child('+tileNumber+')').data('y', y);
   $('div.puzzlePiece:nth-child('+tileNumber+')').animate({
         'left': (x*100)+"px",
         'top': (y*100)+"px"
-      }, animationDuration, 'linear');
-  $('div.puzzlePiece:nth-child('+tileNumber+')').data('x', x);
-  $('div.puzzlePiece:nth-child('+tileNumber+')').data('y', y);
+      }, animationDuration, 'linear', function() {
+        moveable = true;
+      });
 }
 
 function getTileDifference(a, b) {
@@ -57,25 +60,22 @@ function moveHorizontal(data) {
     for (var i = 0; i < tileDifference; i++) {
       $('.puzzlePiece').each(function() {
         if ($(this).data().y === data.y && $(this).data().x === emptyCell.x + i + 1) {
-          selectedTile = $(this);
+          moveTile($(this).index(), $(this).data().x - 1, $(this).data().y);
         }
       });
-      moveTile(selectedTile.index(), selectedTile.data().x - 1, selectedTile.data().y);
     }
     emptyCell.x += tileDifference;
   } else {
     // Right
     for (var i = 0; i < tileDifference; i++) {
       $('.puzzlePiece').each(function() {
-        if ($(this).data().y === data.y && ($(this).data().x === emptyCell.x - i) || $(this).data() === data) {
-          selectedTile = $(this);
+        if ($(this).data().y === data.y && $(this).data().x === emptyCell.x - i - 1) {
+          moveTile($(this).index(), $(this).data().x + 1, $(this).data().y);
         }
       });
-      moveTile(selectedTile.index(), selectedTile.data().x + 1, selectedTile.data().y);
     }
     emptyCell.x -= tileDifference;
   }
-  moveable = true;
 }
 
 function moveVertical(data) {
@@ -86,10 +86,9 @@ function moveVertical(data) {
     for (var i = 0; i < tileDifference; i++) {
       $('.puzzlePiece').each(function() {
         if ($(this).data().x === data.x && $(this).data().y === emptyCell.y + i + 1) {
-          selectedTile = $(this);
+          moveTile($(this).index(), $(this).data().x, $(this).data().y - 1);
         }
       });
-      moveTile(selectedTile.index(), selectedTile.data().x, selectedTile.data().y - 1);
     }
     emptyCell.y += tileDifference;
   } else {
@@ -97,15 +96,13 @@ function moveVertical(data) {
     for (var i = 0; i < tileDifference; i++) {
       $('.puzzlePiece').each(function() {
         if ($(this).data().x === data.x && $(this).data().y === emptyCell.y - i - 1) {
-          selectedTile = $(this);
+          moveTile($(this).index(), $(this).data().x, $(this).data().y + 1);
         }
       });
-      moveTile(selectedTile.index(), selectedTile.data().x, selectedTile.data().y + 1);
     }
     emptyCell.y -= tileDifference;
 
   }
-  moveable = true;
 }
 
 function move(data) {
