@@ -1,14 +1,15 @@
 var emptyCell = {'x': 3, 'y': 3};
 var gridSize = 4;
-var animationDuration = 1000;
+var animationDuration = 300;
 var moveable = true;
 var possiblePositions = [];
 
-function createTile(x, y) {
+function createTile(x, y, tileCount) {
   var tile = $('<div />', {'class':  'puzzlePiece'});
   tile.css('left', (x*100)+"px");
   tile.css('top', (y*100)+"px");
   tile.css('background-position', 'left '+ (-(x*100)) + 'px top ' + (-(y*100)) + 'px');
+  tile.text(tileCount);
   tile.data('x', x);
   tile.data('y', y);
   $('div#puzzleContainer').append(tile);
@@ -20,13 +21,14 @@ function initPuzzle() {
   for (var i = 0; i < gridSize; i++) {
     for (var j = 0; j < gridSize; j++) {
       if (tileCount < (gridSize*gridSize-1)) {
-        createTile(j,i);
+        createTile(j,i, tileCount);
+        possiblePositions.push({'x': j, 'y': i, 'id': tileCount});
         tileCount++;
+      } else {
+        possiblePositions.push({'x': 3, 'y': 3, 'id': 15, 'empty': true});
       }
-      possiblePositions.push({'x': j, 'y': i});
     }
   }
-  console.log(possiblePositions);
 }
 
 function getRandomInt(min, max) {
@@ -34,6 +36,7 @@ function getRandomInt(min, max) {
 }
 
 function generateRandomArray() {
+  console.log(possiblePositions);
   var randomArray = possiblePositions.slice(); // Duplicate array
   do {
     for (var i = 0; i < randomArray.length; i++) {
@@ -42,13 +45,59 @@ function generateRandomArray() {
       randomArray[i] = randomArray[randomInt];
       randomArray[randomInt] = tempValue;
     }
-  } while (1 != 1);
+  } while (!isSolvable(randomArray));
   return randomArray;
+}
+
+// Calculate parity of Manhattan distance of emptyCell
+function calcManhattanDist(array) {
+  var xDifference = getTileDifference(array[15].x, 3);
+  var yDifference = getTileDifference(array[15].y, 3);
+
+  return (xDifference + yDifference) % 2;
+}
+
+function calcParityOfSolution(arrayInput) {
+  var difference = 0;
+  var array = arrayInput.slice();
+  console.log(arrayInput);
+  for (var i = 0; i < array.length; i++) {
+    if (array[i].id !== i) {
+      var temp = array[i];
+      console.log('temp', temp);
+      for (var j = 0; j < array.length; j++) {
+        if (array[j].id === i) {
+          array[i] = array[j];
+          array[j] = temp;
+          difference++;
+        }
+      }
+    }
+  }
+  console.log(array);
+  console.log(difference);
+  return difference % 2;
+}
+
+
+function isSolvable(array) {
+  if (calcParityOfSolution(array) === calcManhattanDist(array)) {
+    console.log('true');
+    return true;
+  } else {
+    console.log('false');
+    return false;
+  }
 }
 
 function randomize(randomArray) {
   for (var i = 0; i < randomArray.length; i++) {
-    moveTile($('div.puzzlePiece:nth-child('+(i + 1)+')'), randomArray[i].x, randomArray[i].y);
+    if (i != 15) {
+      moveTile(i, randomArray[i].x, randomArray[i].y);
+    } else {
+      emptyCell.x = randomArray[15].x;
+      emptyCell.y = randomArray[15].y;
+    }
   }
 }
 
