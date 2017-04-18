@@ -4,6 +4,7 @@ var animationDuration = 300;
 var moveable = true;
 var possiblePositions = [];
 
+// Create puzzlePiece
 function createTile(x, y, tileCount) {
   var tile = $('<div />', {'class':  'puzzlePiece'});
   tile.css('left', (x*100)+"px");
@@ -16,6 +17,7 @@ function createTile(x, y, tileCount) {
 
 }
 
+// Initialize puzzle, generate puzzle pieces
 function initPuzzle() {
   var tileCount = 0;
   for (var i = 0; i < gridSize; i++) {
@@ -31,12 +33,13 @@ function initPuzzle() {
   }
 }
 
+// Get random integer in range
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
+// Generates array with random positions
 function generateRandomArray() {
-  console.log(possiblePositions);
   var randomArray = possiblePositions.slice(); // Duplicate array
   do {
     for (var i = 0; i < randomArray.length; i++) {
@@ -57,14 +60,13 @@ function calcManhattanDist(array) {
   return (xDifference + yDifference) % 2;
 }
 
+// Check partity of permutation
 function calcParityOfSolution(arrayInput) {
   var difference = 0;
   var array = arrayInput.slice();
-  console.log(arrayInput);
   for (var i = 0; i < array.length; i++) {
     if (array[i].id !== i) {
       var temp = array[i];
-      console.log('temp', temp);
       for (var j = 0; j < array.length; j++) {
         if (array[j].id === i) {
           array[i] = array[j];
@@ -74,22 +76,19 @@ function calcParityOfSolution(arrayInput) {
       }
     }
   }
-  console.log(array);
-  console.log(difference);
   return difference % 2;
 }
 
-
+// Check if random generated puzzle is solvable
 function isSolvable(array) {
   if (calcParityOfSolution(array) === calcManhattanDist(array)) {
-    console.log('true');
     return true;
   } else {
-    console.log('false');
     return false;
   }
 }
 
+//
 function randomize(randomArray) {
   for (var i = 0; i < randomArray.length; i++) {
     if (i != 15) {
@@ -185,6 +184,13 @@ function move(data) {
   }
 }
 
+function randomizeImage() {
+  var imageNum = getRandomInt(0, 12);
+  $('div.puzzlePiece').each( function() {
+    $(this).css('background-image', 'url("./_img/'+imageNum+'.jpg")');
+  });
+}
+
 $(document).ready(function() {
   initPuzzle();
   $('.puzzlePiece').click(function(evt) {
@@ -193,7 +199,10 @@ $(document).ready(function() {
 
   $('#randomize').click(function() {
     var randomArray = generateRandomArray();
-    console.log(randomArray);
     randomize(randomArray);
+  });
+
+  $('#image').click(function() {
+    randomizeImage();
   });
 });

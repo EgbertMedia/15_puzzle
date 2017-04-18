@@ -10,6 +10,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-flow: column;
 }
 
 div#puzzleContainer {
@@ -22,5 +23,12 @@ div.puzzlePiece {
   width: 100px;
   height: 100px;
   position: absolute;
-  background-image: url('../_img/puzzle.jpg');
+  background-image: url('../_img/0.jpg');
+}
+
+button {
+  width: 200px;
+  height: 40spx;
+  margin: 10px;
+  font-size: 1.5em;
 }
