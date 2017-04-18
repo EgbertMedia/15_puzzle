@@ -7,12 +7,16 @@ var possiblePositions = [];
 // Create puzzlePiece
 function createTile(x, y, tileCount) {
   var tile = $('<div />', {'class':  'puzzlePiece'});
+  // Set position
   tile.css('left', (x*100)+"px");
   tile.css('top', (y*100)+"px");
+  // Set background to corresponding piece
   tile.css('background-position', 'left '+ (-(x*100)) + 'px top ' + (-(y*100)) + 'px');
   tile.text(tileCount);
+  // Add data to tile
   tile.data('x', x);
   tile.data('y', y);
+  // Add tile to puzzleContainer
   $('div#puzzleContainer').append(tile);
 
 }
@@ -22,6 +26,7 @@ function initPuzzle() {
   var tileCount = 0;
   for (var i = 0; i < gridSize; i++) {
     for (var j = 0; j < gridSize; j++) {
+      // Don't generate div for emptyCell
       if (tileCount < (gridSize*gridSize-1)) {
         createTile(j,i, tileCount);
         possiblePositions.push({'x': j, 'y': i, 'id': tileCount});
@@ -41,6 +46,7 @@ function getRandomInt(min, max) {
 // Generates array with random positions
 function generateRandomArray() {
   var randomArray = possiblePositions.slice(); // Duplicate array
+  // Generate randomArrays until the array is solvable
   do {
     for (var i = 0; i < randomArray.length; i++) {
       var randomInt = getRandomInt(0, randomArray.length);
@@ -62,21 +68,25 @@ function calcManhattanDist(array) {
 
 // Check partity of permutation
 function calcParityOfSolution(arrayInput) {
-  var difference = 0;
+  var permutation = 0;
   var array = arrayInput.slice();
+  // For index in array
   for (var i = 0; i < array.length; i++) {
+    // Check if at correct position
     if (array[i].id !== i) {
       var temp = array[i];
+      // If incorrect, switch tile
       for (var j = 0; j < array.length; j++) {
         if (array[j].id === i) {
           array[i] = array[j];
           array[j] = temp;
-          difference++;
+          permutation++;
         }
       }
     }
   }
-  return difference % 2;
+  // Return parity of permutation
+  return permutation % 2;
 }
 
 // Check if random generated puzzle is solvable
@@ -88,31 +98,37 @@ function isSolvable(array) {
   }
 }
 
-//
+// Moves tiles to correct location based on input array
 function randomize(randomArray) {
   for (var i = 0; i < randomArray.length; i++) {
     if (i != 15) {
       moveTile(i, randomArray[i].x, randomArray[i].y);
     } else {
+      // Set emptyCell x, y to last index of array
       emptyCell.x = randomArray[15].x;
       emptyCell.y = randomArray[15].y;
     }
   }
 }
 
+// Moves tile to x, y
 function moveTile(tileNumber, x, y) {
   tileNumber++; // CSS :nth-child selector starts with 1 instead of 0
   moveable = false;
+  // Change data
   $('div.puzzlePiece:nth-child('+tileNumber+')').data('x', x);
   $('div.puzzlePiece:nth-child('+tileNumber+')').data('y', y);
+  // Animate
   $('div.puzzlePiece:nth-child('+tileNumber+')').animate({
         'left': (x*100)+"px",
         'top': (y*100)+"px"
       }, animationDuration, 'linear', function() {
+        // Allow movement when animation is done
         moveable = true;
       });
 }
 
+// Gets difference between 2 points
 function getTileDifference(a, b) {
   if (a > b) {
     return a - b;
@@ -121,8 +137,10 @@ function getTileDifference(a, b) {
   }
 }
 
+// Handler for horizontal movement
 function moveHorizontal(data) {
   var selectedTile;
+  // Gets difference between clicked tile and emptyCell
   var tileDifference = getTileDifference(data.x, emptyCell.x);
   if (data.x > emptyCell.x) {
     // Left
@@ -147,8 +165,10 @@ function moveHorizontal(data) {
   }
 }
 
+// Handler for vertical movement
 function moveVertical(data) {
   var selectedTile;
+  // Gets difference between clicked tile and emptyCell
   var tileDifference = getTileDifference(data.y, emptyCell.y);
   if (data.y > emptyCell.y) {
     // UP
@@ -174,6 +194,7 @@ function moveVertical(data) {
   }
 }
 
+// Movement handler
 function move(data) {
   if (data.x === emptyCell.x && moveable === true) {
     moveable = false;
@@ -184,6 +205,7 @@ function move(data) {
   }
 }
 
+// Change puzzle image to a random image
 function randomizeImage() {
   var imageNum = getRandomInt(0, 12);
   $('div.puzzlePiece').each( function() {
@@ -192,7 +214,10 @@ function randomizeImage() {
 }
 
 $(document).ready(function() {
+  // Init puzzle
   initPuzzle();
+
+  // Add event handler
   $('.puzzlePiece').click(function(evt) {
     move($(this).data());
   });
