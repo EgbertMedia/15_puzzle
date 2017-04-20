@@ -223,7 +223,7 @@ function checkSolved() {
   });
 
   if (solved) {
-    alert("YOU WON")
+    alert("YOU WON");
   }
 }
 
