@@ -190,7 +190,6 @@ function moveVertical(data) {
       });
     }
     emptyCell.y -= tileDifference;
-
   }
 }
 
@@ -203,6 +202,7 @@ function move(data) {
     moveable = false;
     moveHorizontal(data);
   }
+  checkSolved();
 }
 
 // Change puzzle image to a random image
@@ -211,6 +211,20 @@ function randomizeImage() {
   $('div.puzzlePiece').each( function() {
     $(this).css('background-image', 'url("./_img/'+imageNum+'.jpg")');
   });
+}
+
+// Check if solved
+function checkSolved() {
+  var solved = true;
+  $('div.puzzlePiece').each(function() {
+    if ($(this).data().x !== possiblePositions[$(this).index()].x || $(this).data().y !== possiblePositions[$(this).index()].y) {
+      solved = false;
+    }
+  });
+
+  if (solved) {
+    alert("YOU WON")
+  }
 }
 
 $(document).ready(function() {
